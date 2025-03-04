@@ -1,131 +1,173 @@
 <div>
   <div>
-    <h1>
-      Photo #<%= @the_photo.id %> details
-    </h1>
+    <% if current_user %>
+      <h1>
+        Photo Details
+      </h1>
 
-    <div>
       <div>
-        <a href="/photos">
-          Go back
-        </a>
+        <div>
+          <a href="/photos">
+            Go back
+          </a>
+        </div>
+
+        <div>
+          <% if current_user.id == @the_photo.owner_id %>
+            <a href="/delete_photo/<%= @the_photo.id %>">
+              Delete this photo
+          <% end %>
+          </a>
+        </div>
       </div>
 
-      <div>
-        <a href="/delete_photo/<%= @the_photo.id %>">
-          Delete photo
-        </a>
-      </div>
-    </div>
-
-    <dl>
-      <dt>
-        Caption
-      </dt>
-      <dd>
-        <%= @the_photo.caption %>
-      </dd>
-
-      <dt>
-        Comments count
-      </dt>
-      <dd>
-        <%= @the_photo.comments_count %>
-      </dd>
-
-      <dt>
-        Image
-      </dt>
-      <dd>
-        <%= @the_photo.image %>
-      </dd>
-
-      <dt>
-        Likes count
-      </dt>
-      <dd>
-        <%= @the_photo.likes_count %>
-      </dd>
-
-      <dt>
-        Owner
-      </dt>
-      <dd>
-        <%= @the_photo.owner_id %>
-      </dd>
-
-      <dt>
-        Created at
-      </dt>
-      <dd>
-        <%= time_ago_in_words(@the_photo.created_at) %> ago
-      </dd>
-
-      <dt>
-        Updated at
-      </dt>
-      <dd>
-        <%= time_ago_in_words(@the_photo.updated_at) %> ago
-      </dd>
-    </dl>
-  </div>
-</div>
-
-<hr>
-
-
-<div>
-  <div>
-    <h2>
-      Edit photo
-    </h2>
-
-    <form action="/modify_photo/<%= @the_photo.id %>"  method="post" >
-      <div>
-        <label for="caption_box">
-          Caption
-        </label>
-
-        <textarea id="caption_box" name="query_caption"><%= @the_photo.caption %></textarea>
-      </div>
-
-      <div>
-        <label for="comments_count_box">
-          Comments count
-        </label>
-
-        <input type="text" id="comments_count_box" name="query_comments_count" value="<%= @the_photo.comments_count %>">
-      </div>
-
-      <div>
-        <label for="image_box">
+      <dl>
+        <dt>
           Image
-        </label>
+        </dt>
+        <dd>
+          <img src="<%= @the_photo.image %>" if @the_photo.image.attached? >
+        </dd>
+        <dt>
+          Caption
+        </dt>
+        <dd>
+          <%= @the_photo.caption %>
+        </dd>
 
-        <input type="text" id="image_box" name="query_image" value="<%= @the_photo.image %>">
-      </div>
-
-      <div>
-        <label for="likes_count_box">
-          Likes count
-        </label>
-
-        <input type="text" id="likes_count_box" name="query_likes_count" value="<%= @the_photo.likes_count %>">
-      </div>
-
-      <div>
-        <label for="owner_id_box">
+        <dt>
           Owner
-        </label>
+        </dt>
+        <dd>
+          <%= @the_photo.owner_id %>
+        </dd>
 
-        <input type="text" id="owner_id_box" name="query_owner_id" value="<%= @the_photo.owner_id %>">
-      </div>
+        <dt>
+          Posted
+        </dt>
+        <dd>
+          <%= time_ago_in_words(@the_photo.created_at) %> ago
+        </dd>
 
-      <button>
-        Update photo
-      </button>
-    </form>
+        <dt>
+          Likes count
+        </dt>
+        <dd>
+          <%= @the_photo.likes_count %>
+        </dd>
+
+        <dt>
+          Comments count
+        </dt>
+        <dd>
+          <%= @the_photo.comments_count %>
+        </dd>
+
+        
+
+        
+
+        
+        
+
+        <dt>
+          Updated at
+        </dt>
+        <dd>
+          <%= time_ago_in_words(@the_photo.updated_at) %> ago
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <hr>
+
+
+  <div>
+    <div>
+      <h2>
+        Edit photo
+      </h2>
+
+      <form action="/modify_photo/<%= @the_photo.id %>"  method="post" >
+        <div>
+          <label for="caption_box">
+            Caption
+          </label>
+
+          <textarea id="caption_box" name="query_caption"><%= @the_photo.caption %></textarea>
+        </div>
+
+        <div>
+          <label for="comments_count_box">
+            Comments count
+          </label>
+
+          <input type="text" id="comments_count_box" name="query_comments_count" value="<%= @the_photo.comments_count %>">
+        </div>
+
+        <div>
+          <label for="image_box">
+            Image
+          </label>
+
+          <input type="text" id="image_box" name="query_image" value="<%= @the_photo.image %>">
+        </div>
+
+        <div>
+          <label for="likes_count_box">
+            Likes count
+          </label>
+
+          <input type="text" id="likes_count_box" name="query_likes_count" value="<%= @the_photo.likes_count %>">
+        </div>
+
+        <div>
+          <label for="owner_id_box">
+            Owner
+          </label>
+
+          <input type="text" id="owner_id_box" name="query_owner_id" value="<%= @the_photo.owner_id %>">
+        </div>
+
+        <button>
+          Update photo
+        </button>
+      </form>
+      <% else %>
+        <div>
+        You need to sign in or sign up before continuing.
+        </div>
+
+        <h2>Log in</h2>
+
+        <form class="new_user" id="new_user" action="/users/sign_in" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="Bx_jjoVVjWUVyrk-uGN87eVY0nTcZSN0G9TvCIlUN6ZbSL_jsxioANbEHO2oItjkE5NK4lDXZev_1elv7vwyug" autocomplete="off" />
+          <div class="field">
+            <label for="user_email">Email</label><br />
+            <input autofocus="autofocus" autocomplete="email" type="email" value="" name="user[email]" id="user_email" />
+          </div>
+
+          <div class="field">
+            <label for="user_password">Password</label><br />
+            <input autocomplete="current-password" type="password" name="user[password]" id="user_password" />
+          </div>
+
+            <div class="field">
+              <input name="user[remember_me]" type="hidden" value="0" autocomplete="off" /><input type="checkbox" value="1" name="user[remember_me]" id="user_remember_me" />
+              <label for="user_remember_me">Remember me</label>
+            </div>
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Log in" data-disable-with="Log in" />
+          </div>
+        </form>
+
+          <a href="/users/sign_up">Sign up</a><br />
+
+          <a href="/users/password/new">Forgot your password?</a><br />
+      <% end %>
   </div>
 </div>
+
 
 <hr>

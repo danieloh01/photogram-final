@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
   # Routes for the Like resource:
+  devise_for :users
+
+  get("/users", { :controller => "users", :action => "index" })
+  get("/users/:username", { :controller => "users", :action => "show" })
 
 
   # CREATE
@@ -76,7 +80,7 @@ Rails.application.routes.draw do
 
   #------------------------------
 
-  devise_for :users
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
