@@ -6,6 +6,14 @@
   </div>
 </div>
 
+<% @list_of_follow_requests.each do |request| %>
+  <div>
+    <p><%= request.sender.username %> wants to follow you.</p>
+    <%= button_to "Accept", accept_follow_request_path(request), method: :patch, class: "btn btn-success" %>
+    <%= button_to "Reject", reject_follow_request_path(request), method: :patch, class: "btn btn-danger" %>
+  </div>
+<% end %>
+
 <hr>
 
 <div>

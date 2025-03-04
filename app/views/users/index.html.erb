@@ -6,9 +6,6 @@
   </div>
 </div>
 
-<hr>
-
-<hr>
 <div>
   <div>
     <table border="1">
@@ -44,12 +41,21 @@
         </td>
 
         <td>
-          <button>Follow</button>
+          <% if current_user %>
+            <button>Follow</button>
+          <% end %>
         </td>
 
         <td>
-          <a href="/users/<%= a_user.id %>">
-            Show details
+          <% if !current_user %>  <!-- Check if user is not signed in -->
+            <p class="warning">You need to sign in or sign up before continuing.</p>
+          <% elsif a_user.private != true || a_user.id == current_user.id %>
+            <a href="/users/<%= a_user.id %>">
+              Show detail
+          <% else%>
+            <a href="" >
+              Show detail
+          <% end %>
           </a>
         </td>
       </tr>

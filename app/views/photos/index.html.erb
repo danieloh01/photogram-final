@@ -6,9 +6,8 @@
   </div>
 </div>
 
-<hr>
 
-<div>
+<!--<div>
   <div>
     <h2>
       Add photo
@@ -60,7 +59,26 @@
       </button>
     </form>
   </div>
-</div>
+</div>-->
+
+<form action="/insert_photo" method="post" class="form-horizontal" enctype="multipart/form-data">
+       
+  <label for="browser_input_image">
+    Image
+  </label>
+
+  <input type="file" id="browser_input_image" name="image" placeholder="Enter URL for the image..." class="form-control">
+
+  <label for="caption_box">
+    Caption
+  </label>
+
+  <textarea id="caption_box" name="query_caption" rows="2" placeholder="Enter a caption for the photo"></textarea>
+  
+  <button>
+    Add photo
+  </button>
+</form>
 
 <hr>
 <div>
@@ -92,7 +110,7 @@
       </tr>
 
       <% @list_of_photos.each do |a_photo| %>
-        <% if User.find(a_photo.owner_id).private == false %>
+        <% if User.find(a_photo.owner_id).private != true %>
           <tr>
             <td>
               <img src="<%= a_photo.image %>">
@@ -103,7 +121,7 @@
             </td>
 
             <td>
-              <%= a_photo.owner_id %>
+              <%= User.find(a_photo.owner_id).username %>
             </td>
 
             <td>

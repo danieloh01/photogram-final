@@ -21,10 +21,23 @@
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
 class User < ApplicationRecord
-  has_many  :follow_requests, class_name: "FollowRequest", foreign_key: "recipient_id", dependent: :destroy
+  # mount_uploader :image, ImageUploader
+  
+
   has_many  :comments, class_name: "Comment", foreign_key: "author_id", dependent: :destroy
   has_many  :likes, class_name: "Like", foreign_key: "fan_id", dependent: :destroy
   has_many  :photos, class_name: "Photo", foreign_key: "owner_id", dependent: :destroy
+
+  has_many  :received_follow_requests, class_name: "FollowRequest", foreign_key: "recipient_id", dependent: :destroy
+  has_many  :sent_follow_requests, class_name: "FollowRequest", foreign_key: "sender_id", dependent: :destroy
+
+
+  has_many :liked_photos, through: :likes, source: :photo
+
+  # has_many :recipients, through: :received_follow_requests, source: :recipient, where: { status: :accepted }
+  # # Users this user is following (based on accepted requests)
+  # has_many :senders, through: :sent_follow_requests, source: :sender, where: { status: :accepted }
+
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

@@ -1,4 +1,6 @@
 class FollowRequestsController < ApplicationController
+
+  
   def index
     matching_follow_requests = FollowRequest.all
 
@@ -18,16 +20,29 @@ class FollowRequestsController < ApplicationController
   end
 
   def create
+    # the_follow_request = FollowRequest.new
+    # the_follow_request.recipient_id = params.fetch("query_recipient_id")
+    # the_follow_request.sender_id = params.fetch("query_sender_id")
+    # the_follow_request.status = params.fetch("query_status")
+
+    # if the_follow_request.valid?
+    #   the_follow_request.save
+    #   redirect_to("/follow_requests", { :notice => "Follow request created successfully." })
+    # else
+    #   redirect_to("/follow_requests", { :alert => the_follow_request.errors.full_messages.to_sentence })
+    # end
     the_follow_request = FollowRequest.new
     the_follow_request.recipient_id = params.fetch("query_recipient_id")
     the_follow_request.sender_id = params.fetch("query_sender_id")
-    the_follow_request.status = params.fetch("query_status")
 
-    if the_follow_request.valid?
-      the_follow_request.save
-      redirect_to("/follow_requests", { :notice => "Follow request created successfully." })
+    # Automatically set the status based on the recipient's privacy setting
+    recipient = User.find(the_follow_request.recipient_id)
+    the_follow_request.status = recipient.private? ? "pending" : "accepted"
+
+    if the_follow_request.save
+      redirect_to("/follow_requests", { notice: "Follow request created successfully." })
     else
-      redirect_to("/follow_requests", { :alert => the_follow_request.errors.full_messages.to_sentence })
+      redirect_to("/follow_requests", { alert: the_follow_request.errors.full_messages.to_sentence })
     end
   end
 
@@ -44,6 +59,30 @@ class FollowRequestsController < ApplicationController
       redirect_to("/follow_requests/#{the_follow_request.id}", { :notice => "Follow request updated successfully."} )
     else
       redirect_to("/follow_requests/#{the_follow_request.id}", { :alert => the_follow_request.errors.full_messages.to_sentence })
+    end
+  end
+
+  def accept
+    the_id = params.fetch("path_id")
+    the_follow_request = FollowRequest.find_by(id: the_id, recipient_id: current_user.id, status: "pending")
+  
+    if the_follow_request
+      the_follow_request.update(status: "accepted")
+      redirect_to("/follow_requests", { notice: "Follow request accepted!" })
+    else
+      redirect_to("/follow_requests", { alert: "Follow request not found or already processed." })
+    end
+  end
+  
+  def reject
+    the_id = params.fetch("path_id")
+    the_follow_request = FollowRequest.find_by(id: the_id, recipient_id: current_user.id, status: "pending")
+  
+    if the_follow_request
+      the_follow_request.update(status: "rejected")
+      redirect_to("/follow_requests", { notice: "Follow request rejected." })
+    else
+      redirect_to("/follow_requests", { alert: "Follow request not found or already processed." })
     end
   end
 

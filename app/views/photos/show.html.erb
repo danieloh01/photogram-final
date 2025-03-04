@@ -12,13 +12,6 @@
           </a>
         </div>
 
-        <div>
-          <% if current_user.id == @the_photo.owner_id %>
-            <a href="/delete_photo/<%= @the_photo.id %>">
-              Delete this photo
-          <% end %>
-          </a>
-        </div>
       </div>
 
       <dl>
@@ -39,7 +32,7 @@
           Owner
         </dt>
         <dd>
-          <%= @the_photo.owner_id %>
+          <%= User.find(@the_photo.owner_id).username %>
         </dd>
 
         <dt>
@@ -63,39 +56,154 @@
           <%= @the_photo.comments_count %>
         </dd>
 
-        
-
-        
-
-        
-        
-
+      
+      
         <dt>
-          Updated at
+          Fans
         </dt>
         <dd>
-          <%= time_ago_in_words(@the_photo.updated_at) %> ago
+          <% fan_ids = Like.where(photo_id: @the_photo.id).pluck(:fan_id) %>
+          <% usernames = fan_ids.map { |fan_id| User.find(fan_id).username } %>
+
+          <% if usernames.size == 0 %>
+
+          <% elsif usernames.size == 1 %>
+            <%= usernames.first %>
+          <% elsif usernames.size == 2 %>
+            <%= usernames.join(' and ') %>
+          <% else %>
+            <%= usernames[0..-2].join(', ') %>, and <%= usernames.last %>
+          <% end %>
         </dd>
+
+        <dt>
+          Add a fan
+        </dt>
+
+        <dd>
+          <%#= form_for :like, url: insert_like_path do |f| %>
+            <%#= f.hidden_field :photo_id, value: @the_photo.id %>
+            <%#= f.submit "Like", class: "like-button" %>
+          <%# end %>
+
+          <%# if current_user && Like.exists?(fan_id: current_user.id, photo_id: @the_photo.id) %>
+            <%#= button_to "Like", insert_like_path(photo_id: @the_photo.id, fan_id: current_user.id), method: :post %>
+<!--            -->
+          <%# else %>
+            <%#= button_to "Dislike", delete_like_path(photo_id: @the_photo.id, fan_id: current_user.id), method: :get %>
+          <%# end %>
+
+          <% if current_user && Like.exists?(fan_id: current_user.id, photo_id: @the_photo.id) %>
+            <!-- Find the like_id for the current user and photo -->
+            <% the_like = Like.find_by(fan_id: current_user.id, photo_id: @the_photo.id) %>
+            
+            <!-- Dislike button (method: :delete) -->
+            <%= button_to "Dislike", delete_like_path(the_like.id), method: :delete %>
+          <% else %>
+            <!-- Like button (method: :post) -->
+            <%= button_to "Like", insert_like_path(photo_id: @the_photo.id, fan_id: current_user.id), method: :post %>
+          <% end %>
+
+
+
+        </dd>
+
+
+        <dt>
+          Edit photo
+        </dt>
+
+        <dd>
+          <form action="/insert_photo" method="post" class="form-horizontal" enctype="multipart/form-data">
+        
+            <label for="browser_input_image">
+              Image
+            </label>
+
+            <input type="file" id="browser_input_image" name="image" placeholder="Enter URL for the image..." class="form-control">
+
+            <label for="caption_box">
+              Caption
+            </label>
+
+            <textarea id="caption_box" name="query_caption" rows="2" placeholder="Enter a caption for the photo"></textarea>
+            
+            <button>
+              Update photo
+            </button>
+          </form>
+        </dd>
+        <dt>Delete photo</dt>
+        <dd>
+          <div>
+            <% if current_user.id == @the_photo.owner_id %>
+              <a href="/delete_photo/<%= @the_photo.id %>">
+                Delete this photo
+            <% end %>
+            </a>
+          </div>
+        </dd>
+
+
       </dl>
     </div>
+
+    <h2>Comments</h2>
+    <table>
+      <tr>
+        <th>Commenter</th>
+        <th>Comment</th>
+        <th>Posted</th>
+      </tr>
+
+      <% @list_of_comments.each do |a_comment| %>
+        <% if a_comment.photo_id == @the_photo.id %>
+          <tr>
+            <td>
+              <%= User.find(a_comment.author_id).username %>
+            </td>
+
+            <td>
+              <%= a_comment.body %>
+            </td>
+
+            <td>
+              <%= time_ago_in_words(a_comment.created_at) %> ago
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </table>
+
+
+
+    <h3>Add a new comment</h3>
+
+    <form action="/insert_comment" method="post">
+      <input type="hidden" value="736" name="query_photo_id">
+      
+      <label for="browser_comment">Comment</label>
+      <textarea id="browser_comment" name="query_body" placeholder="Enter a comment..."></textarea>
+
+      <button>Add comment</button>
+    </form>
   </div>
 
-  <hr>
+  
 
-
-  <div>
+  <!--<div>
     <div>
       <h2>
         Edit photo
       </h2>
 
-      <form action="/modify_photo/<%= @the_photo.id %>"  method="post" >
+      <form action="/modify_photo/<%#= @the_photo.id %>"  method="post" >
         <div>
           <label for="caption_box">
             Caption
           </label>
 
-          <textarea id="caption_box" name="query_caption"><%= @the_photo.caption %></textarea>
+          <textarea id="caption_box" name="query_caption"><%#= @the_photo.caption %></textarea>
         </div>
 
         <div>
@@ -103,7 +211,7 @@
             Comments count
           </label>
 
-          <input type="text" id="comments_count_box" name="query_comments_count" value="<%= @the_photo.comments_count %>">
+          <input type="text" id="comments_count_box" name="query_comments_count" value="<%#= @the_photo.comments_count %>">
         </div>
 
         <div>
@@ -111,7 +219,7 @@
             Image
           </label>
 
-          <input type="text" id="image_box" name="query_image" value="<%= @the_photo.image %>">
+          <input type="text" id="image_box" name="query_image" value="<%#= @the_photo.image %>">
         </div>
 
         <div>
@@ -119,7 +227,7 @@
             Likes count
           </label>
 
-          <input type="text" id="likes_count_box" name="query_likes_count" value="<%= @the_photo.likes_count %>">
+          <input type="text" id="likes_count_box" name="query_likes_count" value="<%#= @the_photo.likes_count %>">
         </div>
 
         <div>
@@ -127,15 +235,15 @@
             Owner
           </label>
 
-          <input type="text" id="owner_id_box" name="query_owner_id" value="<%= @the_photo.owner_id %>">
+          <input type="text" id="owner_id_box" name="query_owner_id" value="<%#= @the_photo.owner_id %>">
         </div>
 
         <button>
           Update photo
         </button>
       </form>
-      <% else %>
-        <div>
+      <%# else %>-->
+<!--        <div>
         You need to sign in or sign up before continuing.
         </div>
 
@@ -164,10 +272,7 @@
 
           <a href="/users/sign_up">Sign up</a><br />
 
-          <a href="/users/password/new">Forgot your password?</a><br />
+          <a href="/users/password/new">Forgot your password?</a><br />-->
       <% end %>
   </div>
 </div>
-
-
-<hr>

@@ -1,4 +1,9 @@
 class PhotosController < ApplicationController
+
+  def liked_photos
+    @list_of_photos = current_user.liked_photos
+  end
+  
   def index
     matching_photos = Photo.all
 
@@ -15,6 +20,10 @@ class PhotosController < ApplicationController
     matching_photos = Photo.where({ :id => the_id })
 
     @the_photo = matching_photos.at(0)
+
+    matching_comments = Comment.all
+
+    @list_of_comments = matching_comments.order({ :created_at => :desc })
 
     render({ :template => "photos/show" })
   end

@@ -11,4 +11,15 @@
 #
 class FollowRequest < ApplicationRecord
   belongs_to :recipient, required: true, class_name: "User", foreign_key: "recipient_id"
+  belongs_to :sender, required: true, class_name: "User", foreign_key: "sender_id"
+
+  enum status: { pending: "pending", accepted: "accepted", rejected: "rejected" }
+
+  before_create :set_initial_status
+
+  private
+
+  def set_initial_status
+    self.status = recipient.private? ? "pending" : "accepted"
+  end
 end
